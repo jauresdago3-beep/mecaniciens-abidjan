@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MecanoAbidjan - Trouve ton mécano à Abidjan</title>
+  <meta name="description" content="Trouve un mécano près de toi à Abidjan. Urgence, révision, panne. Géolocalisation gratuite.">
+  
+  <!-- Code AdSense - Étape 3 -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1419959516306937"
+     crossorigin="anonymous"></script>
+  
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:system-ui,sans-serif;background:#0f172a;color:#e2e8f0}
+    #map{height:70vh;width:100%}
+    .search-box{position:absolute;top:20px;left:50%;transform:translateX(-50%);z-index:1000;background:#1e293b;padding:12px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.5);display:flex;gap:8px;width:90%;max-width:400px}
+    .search-box input{flex:1;border:none;background:transparent;color:#fff;outline:none;font-size:16px}
+    .btn{padding:8px 16px;border:none;border-radius:8px;background:#3b82f6;color:#fff;font-weight:600;cursor:pointer}
+    .add-btn{position:absolute;bottom:90px;right:20px;z-index:1000;width:56px;height:56px;border-radius:50%;background:#22c55e;border:none;color:#fff;font-size:28px;cursor:pointer}
+    .popup-card{color:#000}
+    .ads-container{height:15vh;background:#1e293b;padding:10px;display:flex;align-items:center;justify-content:center}
+    .footer{height:15vh;background:#0f172a;padding:10px;text-align:center;font-size:12px;color:#94a3b8}
+  </style>
+</head>
+<body>
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="Chercher un mécano, quartier...">
+    <button class="btn" onclick="searchLocation()">Recher</button>
+  </div>
+  
+  <div id="map"></div>
+  
+  <!-- Bloc pub AdSense - Mets ton data-ad-slot ici -->
+  <div class="ads-container">
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-1419959516306937"
+         data-ad-slot="TON_SLOT_ICI"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+  
+  <button class="add-btn" onclick="alert('Ajouter un mécano - version Pro à venir')">+</button>
+
+  <div class="footer">
+    MecanoAbidjan © 2026 | Trouve ton mécano en 2 clics<br>
+    <small>Publicité • Vie privée • Contact</small>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const map = L.map('map').setView([5.36, -4.01], 12);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    const mecaniciens = [
+      {nom: "Garage Yopougon Auto", tel: "07 00 00 00 01", lat: 5.35, lng: -4.08, quartier: "Yopougon"},
+      {nom: "Mécano Cocody Express", tel: "07 00 00 00 02", lat: 5.34, lng: -3.99, quartier: "Cocody"},
+      {nom: "Auto Service Adjamé", tel: "07 00 00 00 03", lat: 5.36, lng: -4.03, quartier: "Adjamé"}
+    ];
+
+    mecaniciens.forEach(m => {
+      L.marker([m.lat, m.lng]).addTo(map)
+        .bindPopup(`<div class="popup-card"><h3>${m.nom}</h3><p>📍 ${m.quartier}</p><p>📞 ${m.tel}</p></div>`);
+    });
+
+    function searchLocation() {
+      const query = document.getElementById('searchInput').value;
+      if(query) alert('Recherche: ' + query);
+    }
+  </script>
+</body>
+</html>
