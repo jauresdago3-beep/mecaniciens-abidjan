@@ -3,45 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🔧 Mécaniciens Moto Abidjan</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <title>Mécaniciens Abidjan</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+
         body {
             font-family: Arial, sans-serif;
             background: #1a1a2e;
             color: white;
+            min-height: 100vh;
         }
 
         header {
             background: #e94560;
-            padding: 15px;
+            padding: 20px;
             text-align: center;
-            font-size: 18px;
+        }
+
+        header h1 { font-size: 22px; }
+        header p { font-size: 13px; opacity: 0.9; margin-top: 5px; }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px;
+            background: #0f3460;
+        }
+
+        .stat { text-align: center; }
+        .stat span {
+            display: block;
+            font-size: 26px;
             font-weight: bold;
+            color: #e94560;
         }
+        .stat p { font-size: 11px; color: #ccc; }
 
-        #carte {
-            height: 50vh;
-            width: 100%;
-        }
-
-        .formulaire {
+        .search {
             padding: 15px;
             background: #16213e;
         }
 
-        .formulaire h2 {
-            color: #e94560;
-            margin-bottom: 10px;
-            font-size: 16px;
-        }
-
-        input, textarea, select {
+        .search input {
             width: 100%;
-            padding: 10px;
-            margin: 6px 0;
+            padding: 12px;
             border-radius: 8px;
             border: 1px solid #e94560;
             background: #0f3460;
@@ -49,43 +54,47 @@
             font-size: 14px;
         }
 
-        button {
-            width: 100%;
-            padding: 12px;
-            margin: 5px 0;
-            border-radius: 8px;
-            border: none;
-            font-size: 15px;
-            font-weight: bold;
-            cursor: pointer;
+        .nav-btns {
+            display: flex;
+            gap: 10px;
+            padding: 15px;
+            background: #16213e;
         }
 
-        #btnLocaliser {
+        .nav-btns a {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .btn-carte {
             background: #0f3460;
             color: white;
         }
 
-        #btnAjouter {
+        .btn-ajouter {
             background: #e94560;
-            color: white;
-        }
-
-        #btnListe {
-            background: #533483;
             color: white;
         }
 
         .liste {
             padding: 15px;
-            background: #1a1a2e;
-            max-height: 300px;
-            overflow-y: auto;
+        }
+
+        .liste h2 {
+            color: #e94560;
+            margin-bottom: 10px;
+            font-size: 16px;
         }
 
         .carte-mec {
             background: #16213e;
             border-left: 4px solid #e94560;
-            padding: 10px;
+            padding: 12px;
             margin: 8px 0;
             border-radius: 8px;
         }
@@ -108,46 +117,28 @@
             padding: 2px 8px;
             border-radius: 10px;
             font-size: 11px;
-            margin: 3px 2px;
+            margin-top: 5px;
         }
 
-        .stats {
-            display: flex;
-            justify-content: space-around;
-            padding: 10px;
-            background: #0f3460;
-        }
-
-        .stat {
+        .chargement {
             text-align: center;
-        }
-
-        .stat span {
-            display: block;
-            font-size: 22px;
-            font-weight: bold;
-            color: #e94560;
-        }
-
-        .stat p {
-            font-size: 11px;
+            padding: 30px;
             color: #ccc;
         }
 
-        #message {
-            padding: 10px;
-            text-align: center;
-            display: none;
-            border-radius: 8px;
-            margin: 5px 15px;
+        a.tel {
+            color: #e94560;
+            text-decoration: none;
         }
     </style>
 </head>
 <body>
 
-<header>🔧 Mécaniciens Moto — Abidjan</header>
+<header>
+    <h1>🔧 Mécaniciens Abidjan</h1>
+    <p>Trouvez un mécanicien moto près de vous</p>
+</header>
 
-<!-- STATS -->
 <div class="stats">
     <div class="stat">
         <span id="totalMec">0</span>
@@ -163,274 +154,93 @@
     </div>
 </div>
 
-<!-- CARTE -->
-<div id="carte"></div>
-
-<!-- MESSAGE -->
-<div id="message"></div>
-
-<!-- FORMULAIRE -->
-<div class="formulaire">
-    <h2>➕ Ajouter un mécanicien</h2>
-
-    <input type="text" id="nom" placeholder="👤 Nom du mécanicien"/>
-    <input type="text" id="quartier" placeholder="📍 Quartier (ex: Yopougon, Abobo...)"/>
-    <input type="tel" id="telephone" placeholder="📞 Téléphone"/>
-
-    <select id="specialite">
-        <option value="">🔧 Spécialité</option>
-        <option>Toutes marques</option>
-        <option>Honda</option>
-        <option>Yamaha</option>
-        <option>Suzuki</option>
-        <option>Chinoise</option>
-        <option>Électricité moto</option>
-        <option>Pneus/Jantes</option>
-    </select>
-
-    <textarea id="description" placeholder="📝 Description (horaires, services...)" 
-              rows="2"></textarea>
-
-    <button id="btnLocaliser" onclick="maPosition()">
-        📍 Utiliser ma position GPS
-    </button>
-
-    <input type="number" id="lat" placeholder="Latitude (auto ou manuel)" step="any"/>
-    <input type="number" id="lng" placeholder="Longitude (auto ou manuel)" step="any"/>
-
-    <button id="btnAjouter" onclick="ajouterMecanicien()">
-        ✅ Enregistrer le mécanicien
-    </button>
-
-    <button id="btnListe" onclick="toggleListe()">
-        📋 Voir la liste complète
-    </button>
+<div class="search">
+    <input type="text" id="recherche"
+        placeholder="🔍 Rechercher par nom ou quartier..."
+        oninput="filtrer()"/>
 </div>
 
-<!-- LISTE -->
-<div class="liste" id="listeMec" style="display:none"></div>
+<div class="nav-btns">
+    <a href="mecaniciens.html" class="btn-carte">🗺️ Voir la carte</a>
+    <a href="mecaniciens.html" class="btn-ajouter">➕ Ajouter</a>
+</div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<div class="liste">
+    <h2>📋 Liste des mécaniciens</h2>
+    <div id="listeMec">
+        <div class="chargement">⏳ Chargement...</div>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
 <script>
 
-// === DONNÉES ===
-let mecaniciens = JSON.parse(localStorage.getItem("mecaniciens") || "[]");
+const firebaseConfig = {
+    apiKey: "VOTRE_API_KEY",
+    authDomain: "mecaniciens-abidjan.firebaseapp.com",
+    projectId: "mecaniciens-abidjan",
+    storageBucket: "mecaniciens-abidjan.appspot.com",
+    messagingSenderId: "VOTRE_ID",
+    appId: "VOTRE_APP_ID"
+};
 
-// Données de démo
-if (mecaniciens.length === 0) {
-    mecaniciens = [
-        {
-            id: 1,
-            nom: "Kouamé Auto Moto",
-            quartier: "Yopougon",
-            telephone: "07 00 00 00",
-            specialite: "Toutes marques",
-            description: "Ouvert 7j/7, 8h-20h",
-            lat: 5.3500,
-            lng: -4.0500
-        },
-        {
-            id: 2,
-            nom: "Garage Traoré",
-            quartier: "Abobo",
-            telephone: "05 00 00 00",
-            specialite: "Honda",
-            description: "Spécialiste Honda, pièces disponibles",
-            lat: 5.4200,
-            lng: -4.0100
-        },
-        {
-            id: 3,
-            nom: "Moto Service Adjoua",
-            quartier: "Cocody",
-            telephone: "01 00 00 00",
-            specialite: "Yamaha",
-            description: "Réparation rapide, devis gratuit",
-            lat: 5.3600,
-            lng: -3.9800
-        }
-    ];
-    sauvegarder();
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+let tousLesMecs = [];
+
+function chargerMecaniciens() {
+    db.collection("mecaniciens").get()
+        .then(snapshot => {
+            tousLesMecs = [];
+            snapshot.forEach(doc => {
+                tousLesMecs.push({id: doc.id, ...doc.data()});
+            });
+            afficherListe(tousLesMecs);
+            mettreAJourStats(tousLesMecs);
+        })
+        .catch(err => {
+            document.getElementById("listeMec").innerHTML =
+                "<p style='color:#e94560;text-align:center'>❌ Erreur de connexion</p>";
+        });
 }
 
-// === CARTE ===
-const carte = L.map("carte").setView([5.3600, -4.0083], 12);
-
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: "© OpenStreetMap"
-}).addTo(carte);
-
-// Icône personnalisée
-const iconeMec = L.divIcon({
-    html: "🔧",
-    iconSize: [30, 30],
-    className: "icone-mec"
-});
-
-// === AFFICHER MARQUEURS ===
-function afficherMarqueurs() {
-    carte.eachLayer(layer => {
-        if (layer instanceof L.Marker) {
-            carte.removeLayer(layer);
-        }
-    });
-
-    mecaniciens.forEach(m => {
-        const marqueur = L.marker([m.lat, m.lng], {icon: iconeMec})
-            .addTo(carte)
-            .bindPopup(`
-                <b>🔧 ${m.nom}</b><br>
-                📍 ${m.quartier}<br>
-                📞 ${m.telephone}<br>
-                ⚙️ ${m.specialite}<br>
-                📝 ${m.description}
-            `);
-    });
-
-    mettreAJourStats();
-}
-
-// === MA POSITION ===
-function maPosition() {
-    afficherMessage("📍 Localisation en cours...", "#0f3460");
-    navigator.geolocation.getCurrentPosition(
-        pos => {
-            document.getElementById("lat").value = pos.coords.latitude.toFixed(6);
-            document.getElementById("lng").value = pos.coords.longitude.toFixed(6);
-            carte.setView([pos.coords.latitude, pos.coords.longitude], 15);
-            afficherMessage("✅ Position obtenue !", "#27ae60");
-        },
-        err => {
-            afficherMessage("❌ GPS non disponible", "#e94560");
-        }
-    );
-}
-
-// === AJOUTER MÉCANICIEN ===
-function ajouterMecanicien() {
-    const nom = document.getElementById("nom").value.trim();
-    const quartier = document.getElementById("quartier").value.trim();
-    const telephone = document.getElementById("telephone").value.trim();
-    const specialite = document.getElementById("specialite").value;
-    const description = document.getElementById("description").value.trim();
-    const lat = parseFloat(document.getElementById("lat").value);
-    const lng = parseFloat(document.getElementById("lng").value);
-
-    // Validation
-    if (!nom || !quartier || !telephone || !specialite) {
-        afficherMessage("⚠️ Remplis tous les champs !", "#e94560");
+function afficherListe(liste) {
+    const div = document.getElementById("listeMec");
+    if (liste.length === 0) {
+        div.innerHTML = "<p class='chargement'>Aucun mécanicien trouvé</p>";
         return;
     }
-
-    if (isNaN(lat) || isNaN(lng)) {
-        afficherMessage("⚠️ Utilise le GPS ou entre les coordonnées !", "#e94560");
-        return;
-    }
-
-    // Créer le mécanicien
-    const nouveau = {
-        id: Date.now(),
-        nom, quartier, telephone,
-        specialite, description, lat, lng
-    };
-
-    mecaniciens.push(nouveau);
-    sauvegarder();
-    afficherMarqueurs();
-    afficherListe();
-
-    // Centrer sur nouveau
-    carte.setView([lat, lng], 15);
-
-    // Vider le formulaire
-    ["nom","quartier","telephone","description","lat","lng"].forEach(id => {
-        document.getElementById(id).value = "";
-    });
-    document.getElementById("specialite").value = "";
-
-    afficherMessage(`✅ ${nom} ajouté avec succès !`, "#27ae60");
-}
-
-// === LISTE ===
-function afficherListe() {
-    const liste = document.getElementById("listeMec");
-    if (mecaniciens.length === 0) {
-        liste.innerHTML = "<p style='text-align:center;padding:20px'>Aucun mécanicien enregistré</p>";
-        return;
-    }
-
-    liste.innerHTML = mecaniciens.map(m => `
+    div.innerHTML = liste.map(m => `
         <div class="carte-mec">
             <h3>🔧 ${m.nom}</h3>
             <p>📍 ${m.quartier}</p>
-            <p>📞 ${m.telephone}</p>
-            <p>📝 ${m.description}</p>
+            <p>📞 <a class="tel" href="tel:${m.telephone}">${m.telephone}</a></p>
+            <p>📝 ${m.description || ""}</p>
             <span class="badge">${m.specialite}</span>
-            <button onclick="voirSurCarte(${m.lat}, ${m.lng})"
-                style="background:#0f3460;color:white;padding:5px;
-                       border-radius:5px;border:none;margin-top:5px;
-                       width:auto;font-size:12px">
-                🗺️ Voir sur carte
-            </button>
-            <button onclick="supprimer(${m.id})"
-                style="background:#e94560;color:white;padding:5px;
-                       border-radius:5px;border:none;margin-top:5px;
-                       width:auto;font-size:12px;margin-left:5px">
-                🗑️ Supprimer
-            </button>
         </div>
     `).join("");
 }
 
-function toggleListe() {
-    const liste = document.getElementById("listeMec");
-    if (liste.style.display === "none") {
-        liste.style.display = "block";
-        afficherListe();
-    } else {
-        liste.style.display = "none";
-    }
+function filtrer() {
+    const terme = document.getElementById("recherche")
+        .value.toLowerCase();
+    const resultats = tousLesMecs.filter(m =>
+        m.nom.toLowerCase().includes(terme) ||
+        m.quartier.toLowerCase().includes(terme)
+    );
+    afficherListe(resultats);
 }
 
-function voirSurCarte(lat, lng) {
-    carte.setView([lat, lng], 16);
-    document.getElementById("listeMec").style.display = "none";
-    window.scrollTo(0, 0);
-}
-
-function supprimer(id) {
-    mecaniciens = mecaniciens.filter(m => m.id !== id);
-    sauvegarder();
-    afficherMarqueurs();
-    afficherListe();
-    afficherMessage("🗑️ Mécanicien supprimé", "#533483");
-}
-
-// === STATS ===
-function mettreAJourStats() {
-    document.getElementById("totalMec").textContent = mecaniciens.length;
-    const quartiers = [...new Set(mecaniciens.map(m => m.quartier))];
+function mettreAJourStats(liste) {
+    document.getElementById("totalMec").textContent = liste.length;
+    const quartiers = [...new Set(liste.map(m => m.quartier))];
     document.getElementById("totalQuartiers").textContent = quartiers.length;
-    const services = [...new Set(mecaniciens.map(m => m.specialite))];
+    const services = [...new Set(liste.map(m => m.specialite))];
     document.getElementById("totalServices").textContent = services.length;
 }
 
-// === UTILITAIRES ===
-function sauvegarder() {
-    localStorage.setItem("mecaniciens", JSON.stringify(mecaniciens));
-}
-
-function afficherMessage(texte, couleur) {
-    const msg = document.getElementById("message");
-    msg.textContent = texte;
-    msg.style.background = couleur;
-    msg.style.display = "block";
-    setTimeout(() => msg.style.display = "none", 3000);
-}
-
-// === DÉMARRAGE ===
-afficherMarqueurs();
-
+chargerMecaniciens();
 </script>
 </body>
 </html>
